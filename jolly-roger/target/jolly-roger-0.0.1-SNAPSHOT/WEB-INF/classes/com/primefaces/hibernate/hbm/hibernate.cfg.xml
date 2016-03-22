@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <!-- Database connection properties - Driver, URL, user, password -->
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate-primefaces?zeroDateTimeBehavior=convertToNull</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password">password</property>
+    <!-- Connection Pool Size -->
+    <property name="hibernate.connection.pool_size">1</property>
+    <!-- org.hibernate.HibernateException: No CurrentSessionContext configured! -->
+    <property name="hibernate.current_session_context_class">thread</property>
+    <!-- Outputs the SQL queries, should be disabled in Production -->
+    <property name="hibernate.show_sql">true</property>
+    <!-- Dialect is required to let Hibernate know the Database Type, MySQL, Oracle etc
+        Hibernate 4 automatically figure out Dialect from Database Connection Metadata -->
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+    <!-- mapping file, we can use Bean annotations too -->
+    <mapping resource="com/primefaces/hibernate/hbm/employees.hbm.xml"/>
+    <mapping resource="com/primefaces/hibernate/hbm/users.hbm.xml"/>
+    <mapping resource="com/primefaces/hibernate/hbm/department.hbm.xml"/>
+    <mapping resource="com/primefaces/hibernate/hbm/country.hbm.xml"/>
+    <mapping resource="com/primefaces/hibernate/hbm/city.hbm.xml"/>
+    <mapping resource="com/primefaces/hibernate/hbm/address.hbm.xml"/>
+  </session-factory>
+</hibernate-configuration>

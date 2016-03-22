@@ -1,0 +1,323 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="../../../templates/ui.xhtml">
+
+    <ui:define name="content">
+        
+        <h3 class="ui-widget ui-widget-header ui-corner-all submenu-title" style="margin-top:2px"><h:outputText value="#{msgs['ui.src.user.employee.source']}" /></h3>
+            <p:tabView>
+                <p:tab title="employee.xhtml">
+                    <pre name="code" class="brush:xml">
+
+        &lt;h:form id="userDetailForm" rendered="\#{loginBean.user.roles ne null}" &gt;
+            &lt;p:panelGrid id="userDetailPanelGrid" columns="2" style="margin:0 auto;"&gt;
+                &lt;f:facet name="header"&gt;
+                    User Detail
+                &lt;/f:facet&gt;
+                &lt;p:panelGrid id="panelGrid1" columns="2" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="Username:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedUser.username}" /&gt;
+
+                    &lt;h:outputText value="Name:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedEmployee.name}" /&gt;
+
+                    &lt;h:outputText value="Job Role:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedEmployee.jobRole}" /&gt;
+
+                    &lt;h:outputText value="Isert Time:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedEmployee.insertTime}" /&gt;
+                &lt;/p:panelGrid&gt;
+                
+                &lt;p:panelGrid id="panelGrid2" columns="2" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="Department:" /&gt;
+                    &lt;p:commandLink actionListener="\#{employeeBean.showEmployees}" update=":userDetailForm:employeesDatatable"&gt;
+                        &lt;h:outputText value="\#{employeeBean.selectedDepartment.departmentName}"/&gt;
+                    &lt;/p:commandLink&gt;
+                &lt;/p:panelGrid&gt;
+                
+                &lt;p:panelGrid id="panelGrid3" columns="2" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="Address:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedAddress.address} \#{employeeBean.selectedAddress.address2}" /&gt;
+
+                    &lt;h:outputText value="Phone:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedAddress.phone}" /&gt;
+                    
+                    &lt;h:outputText value="District:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedAddress.district}" /&gt;
+
+                    &lt;h:outputText value="Postal Code:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedAddress.postalCode}" /&gt;
+                &lt;/p:panelGrid&gt;
+                
+                &lt;p:panelGrid id="panelGrid4" columns="2" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="City:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedCity.city}" /&gt;
+
+                    &lt;h:outputText value="Country:" /&gt;
+                    &lt;h:outputText value="\#{employeeBean.selectedCountry.country}" /&gt;
+                &lt;/p:panelGrid&gt;
+                &lt;f:facet name="footer"&gt;
+                    &lt;p:commandButton value="Change password" onclick="PF('changePasswordEmployee').show();"
+                                     title="Change password" icon="ui-icon-arrowrefresh-1-w"
+                                     rendered="\#{userBean.selectedUser.roles ne userBean.roleAdmin}"/&gt;
+                &lt;/f:facet&gt;
+            &lt;/p:panelGrid&gt;
+            
+            &lt;br/&gt;
+            
+            &lt;p:dataTable id="employeesDatatable" value="\#{employeeBean.empsList}" widgetVar="employeesDataTable"
+                         var="employee" paginator="true" rows="3"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         lazy="false" rowsPerPageTemplate="3,4,5"&gt;
+                &lt;f:facet name="header"&gt;
+                    Employees &lt;h:outputText value="\#{employeeBean.deptName}" rendered="\#{employeeBean.deptName ne null}" /&gt;
+                &lt;/f:facet&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="Name"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.name}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="Job Role"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.jobRole}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="Inserte Date"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.insertTime}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;f:facet name="footer"&gt;
+                    &lt;p:commandButton value="Clear" actionListener="\#{employeeBean.reset}" update=":userDetailForm:employeesDatatable" icon="ui-icon-circle-close" /&gt;
+                &lt;/f:facet&gt;
+            &lt;/p:dataTable&gt;
+        &lt;/h:form&gt;
+        
+        &lt;p:dialog id="changePasswordDialog" header="Change password"
+                  widgetVar="changePasswordEmployee" &gt;
+            &lt;h:form id="changePasswordForm"&gt;
+                &lt;p:growl id="changePasswordMessage" showDetail="true" /&gt;
+                &lt;p:panelGrid id="displayChangePassword" columns="2" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="Old password :" /&gt;
+                    &lt;h:inputSecret value="\#{userBean.password}" required="true" requiredMessage="Please Enter Password!" /&gt;
+
+                    &lt;h:outputText value="New password :" /&gt;
+                    &lt;h:inputSecret value="\#{userBean.newPassword}" required="true" requiredMessage="Please Enter New Password!"/&gt;
+
+                    &lt;h:outputText value="Repeat new password :" /&gt;
+                    &lt;h:inputSecret value="\#{userBean.repeatedPassword}" required="true" requiredMessage="Please Repeat New Password!"/&gt;
+
+                    &lt;f:facet name="footer"&gt;
+                        &lt;p:commandButton value="Save" update="changePasswordMessage" process="changePasswordForm"
+                                         action="\#{userBean.changePasswordFromDialog}" icon="ui-icon-disk"&gt;
+                        &lt;/p:commandButton&gt;
+                        &lt;p:commandButton value="Cancelar" onclick="PF('changePasswordEmployee').hide()" icon="ui-icon-circle-close"/&gt; 
+                    &lt;/f:facet&gt;
+                &lt;/p:panelGrid&gt;
+            &lt;/h:form&gt;
+        &lt;/p:dialog&gt;
+                        
+                    </pre>
+                </p:tab>
+                
+                <p:tab title="EmployeeBean.java">
+                    <pre name="code" class="brush:java">
+                        
+import com.primefaces.hibernate.criteria.dao.AddressDAO;
+import com.primefaces.hibernate.criteria.dao.CityDAO;
+import com.primefaces.hibernate.criteria.dao.CountryDAO;
+import com.primefaces.hibernate.criteria.dao.DepartmentDAO;
+import com.primefaces.hibernate.criteria.dao.EmployeesDAO;
+import com.primefaces.hibernate.model.Address;
+import com.primefaces.hibernate.model.City;
+import com.primefaces.hibernate.model.Country;
+import com.primefaces.hibernate.model.Department;
+import com.primefaces.hibernate.model.Employees;
+import com.primefaces.hibernate.model.Users;
+import com.primefaces.hibernate.util.HttpSessionUtil;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.servlet.http.HttpSession;
+
+@ManagedBean(name = "employeeBean")
+@ViewScoped
+public class EmployeeBean implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
+    private Country selectedCountry = new Country();
+    private City selectedCity = new City();
+    private Address selectedAddress = new Address();
+    private Employees selectedEmployee = new Employees();
+    private Users selectedUser = new Users();
+    private Department selectedDepartment = new Department();
+    private List&lt;Employees&gt; empsList = new ArrayList&lt;&gt;();
+    private String deptName;
+    private String password;
+    private String newPassword;
+    private String repeatedPassword;
+    
+    private AddressDAO addressDAO;
+    private CityDAO cityDAO;
+    private CountryDAO countryDAO;
+    private DepartmentDAO departmentDAO;
+    private EmployeesDAO employeesDAO;
+    
+    public EmployeeBean() {
+    }
+    
+    @PostConstruct
+    public void init() {
+        HttpSession session = HttpSessionUtil.getSession(false);
+        selectedUser = (Users) session.getAttribute("user");
+        
+        selectedEmployee = selectedUser.getEmployee();
+        
+        addressDAO = new AddressDAO();
+        cityDAO = new CityDAO();
+        countryDAO = new CountryDAO();
+        departmentDAO = new DepartmentDAO();
+        employeesDAO = new EmployeesDAO();
+        
+        selectedDepartment = departmentDAO.findOfEmployee(selectedEmployee);
+        selectedAddress = addressDAO.findOfEmployee(selectedEmployee);
+        selectedCity = cityDAO.findFromAddress(selectedAddress);
+        selectedCountry = countryDAO.findFromCity(selectedCity);
+    }
+    
+    public void showEmployees() {
+        deptName = "( " + selectedDepartment.getDepartmentName() + " )";
+        empsList = employeesDAO.findFromDepartment(selectedDepartment);
+    }
+    
+    public void reset() {
+        deptName = null;
+        empsList.clear();
+    }
+
+    public Country getSelectedCountry() {
+        return selectedCountry;
+    }
+
+    public void setSelectedCountry(Country selectedCountry) {
+        this.selectedCountry = selectedCountry;
+    }
+
+    public City getSelectedCity() {
+        return selectedCity;
+    }
+
+    public void setSelectedCity(City selectedCity) {
+        this.selectedCity = selectedCity;
+    }
+
+    public Address getSelectedAddress() {
+        return selectedAddress;
+    }
+
+    public void setSelectedAddress(Address selectedAddress) {
+        this.selectedAddress = selectedAddress;
+    }
+    
+    public Employees getSelectedEmployee() {
+        return selectedEmployee;
+    }
+
+    public void setSelectedEmployee(Employees selectedEmployee) {
+        this.selectedEmployee = selectedEmployee;
+    }
+
+    public Users getSelectedUser() {
+        return selectedUser;
+    }
+
+    public void setSelectedUser(Users selectedUser) {
+        this.selectedUser = selectedUser;
+    }
+
+    public Department getSelectedDepartment() {
+        return selectedDepartment;
+    }
+
+    public void setSelectedDepartment(Department selectedDepartment) {
+        this.selectedDepartment = selectedDepartment;
+    }
+
+    public List&lt;Employees&gt; getEmpsList() {
+        return empsList;
+    }
+
+    public void setEmpsList(List&lt;Employees&gt; empsList) {
+        this.empsList = empsList;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getRepeatedPassword() {
+        return repeatedPassword;
+    }
+
+    public void setRepeatedPassword(String repeatedPassword) {
+        this.repeatedPassword = repeatedPassword;
+    }
+
+    public AddressDAO getAddressDAO() {
+        return addressDAO;
+    }
+
+    public CityDAO getCityDAO() {
+        return cityDAO;
+    }
+
+    public CountryDAO getCountryDAO() {
+        return countryDAO;
+    }
+
+    public DepartmentDAO getDepartmentDAO() {
+        return departmentDAO;
+    }
+
+    public EmployeesDAO getEmployeesDAO() {
+        return employeesDAO;
+    }
+}
+
+                    </pre>
+                </p:tab>
+            </p:tabView>
+        
+    </ui:define>
+
+</ui:composition>

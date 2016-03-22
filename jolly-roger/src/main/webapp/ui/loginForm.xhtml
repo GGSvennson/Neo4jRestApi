@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="../templates/ui.xhtml">
+    
+    <ui:define name="content">
+    
+            <h:form id="userLoginForm" rendered="#{loginBean.user.roles eq null}">
+                
+                <p:panelGrid id="panelGrid" columns="2" style="margin:0 auto;">
+                    
+                    <f:facet name="header">
+                        <p:messages showDetail="true"/>
+                    </f:facet>
+                    
+                    <p:panelGrid id="captchaPanelGrid" columns="1" style="margin:0 auto;">
+                        <p:captcha converterMessage="#{msgs['ui.login.form.captcha.converter']}"
+                                   requiredMessage="#{msgs['ui.login.form.captcha.required']}"
+                                   validatorMessage="#{msgs['ui.login.form.captcha.validator']}"
+                                   label="Captcha" theme="white" />
+                    </p:panelGrid>
+                    
+                    <p:panelGrid id="loginPanelGrid" columns="2" style="margin:0 auto;">
+                        <h:outputText value="#{msgs['ui.login.form.username']}" />
+                        <h:inputText value="#{loginBean.user.username}" />
+
+                        <h:outputText value="#{msgs['ui.login.form.password']}" />
+                        <h:inputSecret value="#{loginBean.user.password}"/>
+                    </p:panelGrid>
+                    
+                    <f:facet name="footer">
+                        <p:commandButton value="Login" actionListener="#{loginBean.login}"
+                                         oncomplete="Recaptcha.reload()" onerror="Recaptcha.reload()"
+                                         update="panelGrid" process="userLoginForm" ajax="false" icon="ui-icon-check" />
+                    </f:facet>
+                    
+                </p:panelGrid>
+                
+            </h:form>
+
+    </ui:define>
+    
+</ui:composition>

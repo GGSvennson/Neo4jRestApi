@@ -1,0 +1,13 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:h="http://java.sun.com/jsf/html"
+            xmlns:f="http://java.sun.com/jsf/core"
+            xmlns:ui="http://java.sun.com/jsf/facelets"
+            xmlns:p="http://primefaces.org/ui">
+
+    <p:themeSwitcher value="#{themeSwitcherBean.theme}" style="width:155px" effect="fade">
+        <f:selectItem itemLabel="Choose Theme" itemValue="" />
+        <f:selectItems value="#{themeSwitcherBean.themes}" />
+        <p:ajax listener="#{themeSwitcherBean.saveTheme}" />
+    </p:themeSwitcher>
+    
+</ui:composition>

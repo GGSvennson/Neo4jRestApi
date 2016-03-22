@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="com.primefaces.hibernate.model.City" table="city">
+    <id column="city_id" name="cityId" type="java.lang.Short">
+      <generator class="native"/>
+    </id>
+    <property name="city" type="java.lang.String">
+      <column name="city"/>
+    </property>
+    <property name="lastUpdate" type="timestamp">
+      <column name="last_update"/>
+    </property>
+    <bag fetch="select" inverse="true" lazy="true" name="addressList" table="address">
+      <key>
+        <column name="address_id" not-null="true"/>
+      </key>
+      <one-to-many class="com.primefaces.hibernate.model.Address"/>
+    </bag>
+    <many-to-one class="com.primefaces.hibernate.model.Country" fetch="select" name="country">
+      <column name="country_id" not-null="true"/>
+    </many-to-one>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,763 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="../../../templates/ui.xhtml">
+
+    <ui:define name="content">
+        
+        <h3 class="ui-widget ui-widget-header ui-corner-all submenu-title" style="margin-top:2px"><h:outputText value="#{msgs['ui.src.admin.employees.source']}" /></h3>
+            <p:tabView>
+                <p:tab title="employees.xhtml">
+                    <pre name="code" class="brush:xml">
+
+        &lt;ui:define name="content"&gt;
+        &lt;h:form id="employeeListForm" rendered="\#{loginBean.user.roles eq loginBean.roleAdmin}" &gt;
+            &lt;p:growl id="growl" showDetail="true" /&gt;
+            &lt;p:dataTable id="dataTable" value="\#{userBean.employees}" widgetVar="employeesDataTable"
+                         var="employee" paginator="true" rows="5"
+                         rowKey="\#{employee.id}" selectionMode="single" selection="\#{userBean.selectedEmployee}"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         lazy="false" rowsPerPageTemplate="5,10,15"&gt;
+                &lt;p:ajax event="rowSelect" listener="\#{userBean.changeEmployee}" update=":employeeListForm:growl :employeeDetailForm:displayEmployeeDetail :deleteEmployeeForm:deleteEmployeePanelGrid" process="dataTable"/&gt;
+                &lt;f:facet name="header"&gt;
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.datatable.select.row']}" /&gt;
+                &lt;/f:facet&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="\#{msgs['ui.logic.employees.datatable.name']}"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.name}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="\#{msgs['ui.logic.employees.datatable.department']}"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.department.departmentName}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="\#{msgs['ui.logic.employees.datatable.job.role']}"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.jobRole}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;p:column&gt;
+                    &lt;f:facet name="header"&gt;
+                        &lt;h:outputText value="\#{msgs['ui.logic.employees.datatable.insert.time']}"&gt;&lt;/h:outputText&gt;
+                    &lt;/f:facet&gt;
+                    &lt;h:outputText value="\#{employee.insertTime}"&gt;&lt;/h:outputText&gt;
+                &lt;/p:column&gt;
+                &lt;f:facet name="footer"&gt;
+                    &lt;p:commandButton value="\#{msgs['ui.logic.employees.datatable.footer.new.employee']}" onclick="PF('createEmployee').show();" icon="ui-icon-star" title="Create new employee"/&gt;
+                    &lt;p:commandButton value="\#{msgs['ui.logic.employees.datatable.footer.edit.employee']}" actionListener="\#{userBean.openEditEmployeeDialog}"
+                                     update=":employeeListForm:growl" title="Edit Employee" icon="ui-icon-arrowrefresh-1-w" &gt;
+                    &lt;/p:commandButton&gt;
+                    &lt;p:commandButton value="\#{msgs['ui.logic.employees.datatable.footer.delete.employee']}" onclick="PF('deleteEmployee').show();" icon="ui-icon-trash"/&gt;
+                &lt;/f:facet&gt;
+            &lt;/p:dataTable&gt;
+        &lt;/h:form&gt;
+        
+        &lt;p:dialog id="deleteDialog" header="\#{msgs['ui.logic.employees.delete.employee.header']}" widgetVar="deleteEmployee" &gt;
+            &lt;h:form id="deleteEmployeeForm"&gt;
+                &lt;p:growl id="deleteMessage" showDetail="true" /&gt;
+                &lt;p:panelGrid id="deleteEmployeePanelGrid" columns="1" style="margin:0 auto;"&gt;
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.delete.employee.delete']} \#{userBean.selectedEmployee.name}?"&gt;&lt;/h:outputText&gt;
+                    &lt;p:panelGrid id="acceptCancelPanelGrid" columns="2" style="margin:0 auto;"&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.delete.employee.button.delete']}" actionListener="\#{userBean.deleteEmployee}" onclick="PF('deleteEmployee').hide()" update=":deleteEmployeeForm:deleteMessage" icon="ui-icon-trash"&gt;
+                            &lt;p:ajax event="click" oncomplete="updateDataTableAfterDelete();"/&gt;
+                            &lt;p:remoteCommand id="remoteCommandDeleteId" name="updateDataTableAfterDelete"
+                                actionListener="\#{userBean.updateData}" update=":employeeListForm:dataTable"/&gt;
+                        &lt;/p:commandButton&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.delete.employee.button.cancel']}" onclick="PF('deleteEmployee').hide()" icon="ui-icon-circle-close"/&gt;
+                    &lt;/p:panelGrid&gt;
+                &lt;/p:panelGrid&gt;
+            &lt;/h:form&gt;
+        &lt;/p:dialog&gt;
+        
+        &lt;p:dialog id="editDialog" header="\#{msgs['ui.logic.employees.edit.employee.header']}" widgetVar="editEmployee" &gt;
+            &lt;h:form id="employeeDetailForm"&gt;
+                &lt;p:growl id="editMessage" showDetail="true" /&gt;
+                &lt;p:panelGrid id="displayEmployeeDetail" columns="2" style="margin:0 auto;"&gt;
+                    
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.edit.employee.name']}" /&gt;
+                    &lt;p:inputText value="\#{userBean.selectedEmployee.name}" /&gt;
+                    
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.edit.employee.role']}" /&gt;
+                    &lt;h:outputLabel value="\#{userBean.roleUser}" /&gt;
+                    
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.edit.employee.job.role']}" /&gt;
+                    &lt;p:inputText value="\#{userBean.selectedEmployee.jobRole}" /&gt;
+
+                    &lt;p:outputLabel for="button" value="\#{msgs['ui.logic.employees.edit.employee.insert.time']}" /&gt;
+                    &lt;p:calendar id="button" value="\#{userBean.selectedEmployee.insertTime}" showOn="button" /&gt;
+
+                    &lt;h:outputLabel for="countryList" value="\#{msgs['ui.logic.employees.edit.employee.countries']}" /&gt;
+                    &lt;h:selectOneMenu id="countryList" value="\#{userBean.newCountry}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemValue="\#{userBean.selectedCountry}" itemLabel="\#{userBean.selectedCountry.country}" /&gt;
+                        &lt;f:selectItems value="\#{userBean.countries}" var="country" 
+                                       itemValue="\#{country}" itemLabel="\#{country.country}"/&gt;
+                        &lt;f:ajax listener="\#{userBean.loadCities}" render="cityList" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="cityList" value="\#{msgs['ui.logic.employees.edit.employee.cities']}" /&gt;
+                    &lt;h:selectOneMenu id="cityList" value="\#{userBean.newCity}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemValue="\#{userBean.selectedCity}" itemLabel="\#{userBean.selectedCity.city}" /&gt;
+                        &lt;f:selectItems value="\#{userBean.cities}" var="city"
+                                       itemValue="\#{city}" itemLabel="\#{city.city}" /&gt;
+                        &lt;f:ajax listener="\#{userBean.loadAddresses}" render="addressList" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="addressList" value="\#{msgs['ui.logic.employees.edit.employee.addresses']}" /&gt;
+                    &lt;h:selectOneMenu id="addressList" value="\#{userBean.newAddress}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemValue="\#{userBean.selectedAddress}" itemLabel="\#{userBean.selectedAddress.address}" /&gt;
+                        &lt;f:selectItems value="\#{userBean.addresses}" var="address"
+                                       itemValue="\#{address}" itemLabel="\#{address.address}" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="departmentList" value="\#{msgs['ui.logic.employees.edit.employee.departments']}" /&gt;
+                    &lt;h:selectOneMenu id="departmentList" value="\#{userBean.newDepartment}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemValue="\#{userBean.selectedDepartment}" itemLabel="\#{userBean.selectedDepartment.departmentName}" /&gt;
+                        &lt;f:selectItems value="\#{userBean.departments}" var="department"
+                                       itemValue="\#{department}" itemLabel="\#{department.departmentName}" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;f:facet name="footer"&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.edit.employee.footer.button.save']}" update="editMessage" process="employeeDetailForm"
+                                         action="\#{userBean.editEmployeeFromDialog}" icon="ui-icon-disk"&gt;
+                            &lt;p:ajax event="click" oncomplete="updateDataTableAfterEdit();"/&gt;
+                            &lt;p:remoteCommand id="remoteCommandDeleteId" name="updateDataTableAfterEdit"
+                                actionListener="\#{userBean.updateData}"
+                                update=":employeeListForm:dataTable"/&gt;
+                        &lt;/p:commandButton&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.edit.employee.footer.button.cancel']}" actionListener="\#{userBean.closeEditEmployeeDialog}" icon="ui-icon-circle-close"/&gt;
+                    &lt;/f:facet&gt;
+                    
+                &lt;/p:panelGrid&gt;
+            &lt;/h:form&gt;
+        &lt;/p:dialog&gt;
+
+        &lt;p:dialog id="createDialog" header="\#{msgs['ui.logic.employees.create.employee.header']}" widgetVar="createEmployee"&gt;
+            &lt;h:form id="newEmployeeForm"&gt;
+                &lt;p:growl id="createMessage" showDetail="true" /&gt;
+                &lt;p:panelGrid id="displayNewEmployee" columns="2" style="margin:0 auto;"&gt;
+
+                    &lt;h:outputLabel for="username" value="\#{msgs['ui.logic.employees.create.employee.username']}" /&gt;
+                    &lt;p:inputText id="username" value="\#{userBean.newUser.username}" &gt;
+                        &lt;p:ajax listener="\#{userBean.checkUsername}" event="blur" update="createMessage" /&gt;
+                    &lt;/p:inputText&gt;
+                    
+                    &lt;h:outputLabel for="pwd" value="\#{msgs['ui.logic.employees.create.employee.password']}" /&gt;
+                    &lt;p:password id="pwd" value="\#{userBean.newUser.password}" label="Password" /&gt;
+
+                    &lt;h:outputLabel for="rpwd" value="\#{msgs['ui.logic.employees.create.employee.repeat.password']}" /&gt;
+                    &lt;p:password id="rpwd" value="\#{userBean.password}" /&gt;
+                    
+                    &lt;h:outputText value="\#{msgs['ui.logic.employees.create.employee.role']}" /&gt;
+                    &lt;h:outputLabel value="\#{userBean.roleUser}" /&gt;
+
+                    &lt;h:outputLabel for="nm" value="\#{msgs['ui.logic.employees.create.employee.name']}" /&gt;
+                    &lt;p:inputText id="nm" value="\#{userBean.newEmployee.name}" /&gt;
+
+                    &lt;h:outputLabel for="jr" value="\#{msgs['ui.logic.employees.create.employee.job.role']}" /&gt;
+                    &lt;p:inputText id="jr" value="\#{userBean.newEmployee.jobRole}" /&gt;
+
+                    &lt;h:outputLabel for="button" value="\#{msgs['ui.logic.employees.create.employee.insert.time']}" /&gt;
+                    &lt;p:calendar id="button" value="\#{userBean.newEmployee.insertTime}" showOn="button" /&gt;
+                    
+                    &lt;h:outputLabel for="countryList" value="\#{msgs['ui.logic.employees.create.employee.countries']}" /&gt;
+                    &lt;h:selectOneMenu id="countryList" value="\#{userBean.newCountry}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemLabel="Select country" noSelectionOption="true" /&gt;
+                        &lt;f:selectItems value="\#{userBean.countries}" var="country" 
+                                       itemValue="\#{country}" itemLabel="\#{country.country}"/&gt;
+                        &lt;f:ajax listener="\#{userBean.loadCities}" render="cityList" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="cityList" value="\#{msgs['ui.logic.employees.create.employee.cities']}" /&gt;
+                    &lt;h:selectOneMenu id="cityList" value="\#{userBean.newCity}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemLabel="Select city" noSelectionOption="true" /&gt;
+                        &lt;f:selectItems value="\#{userBean.cities}" var="city"
+                                       itemValue="\#{city}" itemLabel="\#{city.city}" /&gt;
+                        &lt;f:ajax listener="\#{userBean.loadAddresses}" render="addressList" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="addressList" value="\#{msgs['ui.logic.employees.create.employee.addresses']}" /&gt;
+                    &lt;h:selectOneMenu id="addressList" value="\#{userBean.newAddress}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemLabel="Select address" noSelectionOption="true" /&gt;
+                        &lt;f:selectItems value="\#{userBean.addresses}" var="address"
+                                       itemValue="\#{address}" itemLabel="\#{address.address}" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+                    
+                    &lt;h:outputLabel for="departmentList" value="\#{msgs['ui.logic.employees.create.employee.departments']}" /&gt;
+                    &lt;h:selectOneMenu id="departmentList" value="\#{userBean.newDepartment}" converter="omnifaces.SelectItemsConverter" &gt;
+                        &lt;f:selectItem itemLabel="Select department" noSelectionOption="true" /&gt;
+                        &lt;f:selectItems value="\#{userBean.departments}" var="department"
+                                       itemValue="\#{department}" itemLabel="\#{department.departmentName}" /&gt;
+                    &lt;/h:selectOneMenu&gt;
+
+                    &lt;f:facet name="footer"&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.create.employee.footer.button.save']}" update="createMessage" process="newEmployeeForm"  
+                                    action="\#{userBean.createEmployeeFromDialog}" icon="ui-icon-disk"&gt;
+                            &lt;p:ajax event="click" oncomplete="updateDataTableAfterCreate();"/&gt;
+                            &lt;p:remoteCommand id="remoteCommandDeleteId" name="updateDataTableAfterCreate"
+                                actionListener="\#{userBean.updateData}"
+                                update=":employeeListForm:dataTable"/&gt;
+                        &lt;/p:commandButton&gt;
+                        &lt;p:commandButton value="\#{msgs['ui.logic.employees.create.employee.footer.button.cancel']}" onclick="PF('createEmployee').hide()" icon="ui-icon-circle-close"/&gt;
+                    &lt;/f:facet&gt;
+                &lt;/p:panelGrid&gt;
+            &lt;/h:form&gt;
+        &lt;/p:dialog&gt;
+
+    &lt;/ui:define&gt;
+
+                    </pre>
+                </p:tab>
+                
+                <p:tab title="UserBean.java">
+                    <pre name="code" class="brush:java">
+import com.primefaces.hibernate.criteria.dao.AddressDAO;
+import com.primefaces.hibernate.criteria.dao.CityDAO;
+import com.primefaces.hibernate.criteria.dao.CountryDAO;
+import com.primefaces.hibernate.criteria.dao.DepartmentDAO;
+import com.primefaces.hibernate.criteria.dao.EmployeesDAO;
+import com.primefaces.hibernate.criteria.dao.UsersDAO;
+import com.primefaces.hibernate.model.Address;
+import com.primefaces.hibernate.model.City;
+import com.primefaces.hibernate.model.Country;
+import com.primefaces.hibernate.model.Department;
+import com.primefaces.hibernate.model.Employees;
+import com.primefaces.hibernate.model.Roles;
+import java.io.Serializable;
+import com.primefaces.hibernate.model.Users;
+import com.primefaces.hibernate.util.HttpSessionUtil;
+import com.primefaces.hibernate.util.LoginConverter;
+
+import java.util.ArrayList;
+import java.util.List;
+ 
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
+
+@ManagedBean(name = "userBean")
+@ViewScoped
+public class UserBean implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
+    private Users newUser = new Users();
+    private Employees newEmployee = new Employees();
+    private Department newDepartment = new Department();
+    private Address newAddress = new Address();
+    private City newCity = new City();
+    private Country newCountry = new Country();
+    private Users selectedUser = new Users();
+    private Employees selectedEmployee = new Employees();
+    private Department selectedDepartment = new Department();
+    private Address selectedAddress = new Address();
+    private City selectedCity = new City();
+    private Country selectedCountry = new Country();
+    private List&lt;Users&gt; users = new ArrayList&lt;&gt;();
+    private List&lt;Employees&gt; employees = new ArrayList&lt;&gt;();
+    private List&lt;Department&gt; departments = new ArrayList&lt;&gt;();
+    private List&lt;Address&gt; addresses = new ArrayList&lt;&gt;();
+    private List&lt;City&gt; cities = new ArrayList&lt;&gt;();
+    private List&lt;Country&gt; countries = new ArrayList&lt;&gt;();
+    private Roles[] roleses;
+    
+    private final Roles roleAdmin = Roles.Administrator;
+    private final Roles roleUser = Roles.User;
+    
+    private int employeeId;
+    
+    private String password;
+    private String newPassword;
+    private String repeatedPassword;
+    
+    private UsersDAO usersDAO;
+    private EmployeesDAO employeesDAO;
+    private AddressDAO addressDAO;
+    private CityDAO cityDAO;
+    private CountryDAO countryDAO;
+    private DepartmentDAO departmentDAO;
+    
+    @ManagedProperty(value="#{resourceBundleBean}")
+    private ResourceBundleBean resourceBundleBean;
+    
+    public UserBean() {
+    }
+    
+    @PostConstruct
+    public void initUsers() {
+        HttpSession session = HttpSessionUtil.getSession(false);
+        selectedUser = (Users) session.getAttribute("user");
+        
+        usersDAO = new UsersDAO();
+        employeesDAO = new EmployeesDAO();
+        addressDAO = new AddressDAO();
+        cityDAO = new CityDAO();
+        countryDAO = new CountryDAO();
+        departmentDAO = new DepartmentDAO();
+        
+        users = usersDAO.list();
+        employees = employeesDAO.list();
+        departments = departmentDAO.listNotAdministration();
+        countries = countryDAO.list();
+    }
+    
+    public void changePasswordFromDialog() throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        if(!LoginConverter.hash256(password).equals(selectedUser.getPassword())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.change.password.password.does.not.match")
+                ));
+        } else if(!newPassword.equals(repeatedPassword)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.change.password.new.password.does.not.match")
+                ));
+        } else {
+            selectedUser.setPassword(LoginConverter.hash256(newPassword));
+            usersDAO.update(selectedUser);
+            
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.execute("PF('changePasswordEmployee').hide()");
+        
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.change.password.password.changed")
+                ));
+        }
+    }
+    
+    public void createEmployeeFromDialog() throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        if( ("".equals(newUser.getUsername())) ||
+                ("".equals(newUser.getPassword()))
+                || ("".equals(password))
+                || ("".equals(newEmployee.getName()))
+                || ("".equals(newEmployee.getJobRole()))
+                || (null == newEmployee.getInsertTime())
+                || (null == newCountry)
+                || (null == newCity)
+                || (null == newAddress)
+                || (null == newDepartment) ) {
+            
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.create.employee.no.one.empty.field")
+                ));
+            
+        } else if(!password.equals(newUser.getPassword()))
+            
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.create.employee.passwords")
+                ));
+        
+        else {
+            Users user = usersDAO.findByUsername(newUser.getUsername());
+            if(null != user) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.check.username")
+                    ));
+            } else {
+                newUser.setRoles(this.roleUser);
+                newEmployee.setAddress(newAddress);
+                newEmployee.setDepartment(newDepartment);
+                usersDAO.create(newEmployee, newUser);
+
+                RequestContext rc = RequestContext.getCurrentInstance();
+                rc.execute("PF('createEmployee').hide()");
+
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(
+                                ResourceBundleBean.getResourceBundleString("UserBean.create.employee.new.employee.created")
+                        ));
+
+                reset();
+            }
+        }
+    }
+    
+    public void openEditEmployeeDialog() {
+        if(null == selectedEmployee) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.open.edit.employee.dialog")
+                    ));
+        }
+        else {
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.execute("PF('editEmployee').show()");
+        }
+    }
+    
+    public void closeEditEmployeeDialog() {
+        reset();
+        RequestContext rc = RequestContext.getCurrentInstance();
+        rc.execute("PF('editEmployee').hide()");
+    }
+    
+    public void editEmployeeFromDialog() {
+        if( ("".equals(selectedEmployee.getName()))
+                || ("".equals(selectedEmployee.getJobRole()))
+                || (null == selectedEmployee.getInsertTime())
+                || (null == newCountry)
+                || (null == newCity)
+                || (null == newAddress)
+                || (null == newDepartment) ) {
+            
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.edit.employee.from.dialog.no.one.field.empty")
+                    ));
+        } else {
+            employeesDAO.update(selectedEmployee);
+
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.execute("PF('editEmployee').hide()");
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.edit.employee.from.dialog.employee.updated")
+                    ));
+
+            reset();
+        }
+    }
+    
+    public void openDeleteEmployeeDialog() {
+        if(null == selectedEmployee) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.open.delete.employee.dialog")
+                    ));
+        } else {
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.execute("PF('deleteEmployee').show()");
+        }
+    }
+    
+    public void closeDeleteEmployeeDialog() {
+        RequestContext rc = RequestContext.getCurrentInstance();
+        rc.execute("PF('deleteEmployee').hide()");
+        reset();
+    }
+    
+    public void deleteEmployee() {
+        if(selectedEmployee.equals(selectedUser.getEmployee())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.delete.employee")
+                ));
+        } else {
+            employeesDAO.delete(selectedEmployee);
+        
+            RequestContext rc = RequestContext.getCurrentInstance();
+            rc.execute("PF('deleteEmployee').hide()");
+        
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(
+                            ResourceBundleBean.getResourceBundleString("UserBean.delete.employee.employee.deleted")
+                    ));
+        
+            reset();
+        }
+    }
+    
+    public void showEmployees() {
+        if(employees.isEmpty()) {
+            employees = employeesDAO.list();
+        }
+    }
+    
+    public void updateData() {
+        users.clear();
+        employees.clear();
+        users = usersDAO.list();
+        employees = employeesDAO.list();
+    }
+    
+    public void changeEmployee(SelectEvent event) {
+        selectedEmployee = (Employees) event.getObject();
+        Users user = usersDAO.findByEmployee(selectedEmployee);
+        if(user.getRoles() != this.roleUser) {
+            selectedEmployee = new Employees();
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(
+                        ResourceBundleBean.getResourceBundleString("UserBean.change.employee")
+                ));
+        } else {
+            selectedDepartment = departmentDAO.findOfEmployee(selectedEmployee);
+            selectedAddress = addressDAO.findOfEmployee(selectedEmployee);
+            selectedCity = cityDAO.findFromAddress(selectedAddress);
+            selectedCountry = countryDAO.findFromCity(selectedCity);
+        }
+    }
+    
+    public void loadCities() {
+        cities = cityDAO.findOfCountry(newCountry);
+    }
+    
+    public void loadAddresses() {
+        addresses = addressDAO.findFromCity(newCity);
+    }
+    
+    private void reset() {
+        selectedUser = new Users();
+        newUser = new Users();
+        selectedEmployee = new Employees();
+        newEmployee = new Employees();
+        selectedDepartment = new Department();
+        newDepartment = new Department();
+        selectedAddress = new Address();
+        newAddress = new Address();
+        selectedCity = new City();
+        newCity = new City();
+        selectedCountry = new Country();
+        newCountry = new Country();
+    }
+    
+    public Users getNewUser() {
+        return newUser;
+    }
+
+    public void setNewUser(Users newUser) {
+        this.newUser = newUser;
+    }
+
+    public Users getSelectedUser() {
+        return selectedUser;
+    }
+
+    public void setSelectedUser(Users selectedUser) {
+        this.selectedUser = selectedUser;
+    }
+
+    public Employees getSelectedEmployee() {
+        return selectedEmployee;
+    }
+
+    public void setSelectedEmployee(Employees selectedEmployee) {
+        this.selectedEmployee = selectedEmployee;
+    }
+
+    public Employees getNewEmployee() {
+        return newEmployee;
+    }
+
+    public void setNewEmployee(Employees newEmployee) {
+        this.newEmployee = newEmployee;
+    }
+
+    public Department getNewDepartment() {
+        return newDepartment;
+    }
+
+    public void setNewDepartment(Department newDepartment) {
+        this.newDepartment = newDepartment;
+    }
+
+    public Address getNewAddress() {
+        return newAddress;
+    }
+
+    public void setNewAddress(Address newAddress) {
+        this.newAddress = newAddress;
+    }
+
+    public Department getSelectedDepartment() {
+        return selectedDepartment;
+    }
+
+    public void setSelectedDepartment(Department selectedDepartment) {
+        this.selectedDepartment = selectedDepartment;
+    }
+
+    public Address getSelectedAddress() {
+        return selectedAddress;
+    }
+
+    public void setSelectedAddress(Address selectedAddress) {
+        this.selectedAddress = selectedAddress;
+    }
+
+    public City getNewCity() {
+        return newCity;
+    }
+
+    public void setNewCity(City newCity) {
+        this.newCity = newCity;
+    }
+
+    public Country getNewCountry() {
+        return newCountry;
+    }
+
+    public void setNewCountry(Country newCountry) {
+        this.newCountry = newCountry;
+    }
+
+    public City getSelectedCity() {
+        return selectedCity;
+    }
+
+    public void setSelectedCity(City selectedCity) {
+        this.selectedCity = selectedCity;
+    }
+
+    public Country getSelectedCountry() {
+        return selectedCountry;
+    }
+
+    public void setSelectedCountry(Country selectedCountry) {
+        this.selectedCountry = selectedCountry;
+    }
+    
+    public List&lt;Users&gt; getUsers() {
+        return users;
+    }
+
+    public void setUsers(List&lt;Users&gt; users) {
+        this.users = users;
+    }
+
+    public List&lt;Employees&gt; getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List&lt;Employees&gt; employees) {
+        this.employees = employees;
+    }
+
+    public List&lt;Department&gt; getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List&lt;Department&gt; departments) {
+        this.departments = departments;
+    }
+
+    public List&lt;Address&gt; getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List&lt;Address&gt; addresses) {
+        this.addresses = addresses;
+    }
+
+    public List&lt;City&gt; getCities() {
+        return cities;
+    }
+
+    public void setCities(List&lt;City&gt; cities) {
+        this.cities = cities;
+    }
+
+    public List&lt;Country&gt; getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List&lt;Country&gt; countries) {
+        this.countries = countries;
+    }
+
+    public Roles[] getRoleses() {
+        roleses = Roles.values();
+        return roleses;
+    }
+
+    public void setRoleses(Roles[] roleses) {
+        this.roleses = roleses;
+    }
+
+    public Roles getRoleAdmin() {
+        return roleAdmin;
+    }
+
+    public Roles getRoleUser() {
+        return roleUser;
+    }
+
+    public int getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getRepeatedPassword() {
+        return repeatedPassword;
+    }
+
+    public void setRepeatedPassword(String repeatedPassword) {
+        this.repeatedPassword = repeatedPassword;
+    }
+
+    public UsersDAO getUsersDAO() {
+        return usersDAO;
+    }
+
+    public EmployeesDAO getEmployeesDAO() {
+        return employeesDAO;
+    }
+
+    public AddressDAO getAddressDAO() {
+        return addressDAO;
+    }
+
+    public CityDAO getCityDAO() {
+        return cityDAO;
+    }
+
+    public CountryDAO getCountryDAO() {
+        return countryDAO;
+    }
+
+    public DepartmentDAO getDepartmentDAO() {
+        return departmentDAO;
+    }
+
+    public ResourceBundleBean getResourceBundleBean() {
+        return resourceBundleBean;
+    }
+
+    public void setResourceBundleBean(ResourceBundleBean resourceBundleBean) {
+        this.resourceBundleBean = resourceBundleBean;
+    }
+}
+                    </pre>
+                </p:tab>
+            </p:tabView>
+        
+    </ui:define>
+
+</ui:composition>

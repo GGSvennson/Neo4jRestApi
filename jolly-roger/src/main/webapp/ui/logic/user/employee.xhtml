@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="../../../templates/ui.xhtml">
+
+    <ui:define name="content">
+        <h:form id="userDetailForm" rendered="#{loginBean.user.roles ne null}" >
+            <p:panelGrid id="userDetailPanelGrid" columns="2" style="margin:0 auto;">
+                <f:facet name="header">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail']}" />
+                </f:facet>
+                <p:panelGrid id="panelGrid1" columns="2" style="margin:0 auto;">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.username']}" />
+                    <h:outputText value="#{employeeBean.selectedUser.username}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.name']}" />
+                    <h:outputText value="#{employeeBean.selectedEmployee.name}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.job.role']}" />
+                    <h:outputText value="#{employeeBean.selectedEmployee.jobRole}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.datatable.insert.time']}" />
+                    <h:outputText value="#{employeeBean.selectedEmployee.insertTime}" />
+                </p:panelGrid>
+                
+                <p:panelGrid id="panelGrid2" columns="2" style="margin:0 auto;">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.department']}" />
+                    <p:commandLink actionListener="#{employeeBean.showEmployees}" update=":userDetailForm:employeesDatatable">
+                        <h:outputText value="#{employeeBean.selectedDepartment.departmentName}"/>
+                    </p:commandLink>
+                </p:panelGrid>
+                
+                <p:panelGrid id="panelGrid3" columns="2" style="margin:0 auto;">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.address']}" />
+                    <h:outputText value="#{employeeBean.selectedAddress.address} #{employeeBean.selectedAddress.address2}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.phone']}" />
+                    <h:outputText value="#{employeeBean.selectedAddress.phone}" />
+                    
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.district']}" />
+                    <h:outputText value="#{employeeBean.selectedAddress.district}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.postal.code']}" />
+                    <h:outputText value="#{employeeBean.selectedAddress.postalCode}" />
+                </p:panelGrid>
+                
+                <p:panelGrid id="panelGrid4" columns="2" style="margin:0 auto;">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.city']}" />
+                    <h:outputText value="#{employeeBean.selectedCity.city}" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.country']}" />
+                    <h:outputText value="#{employeeBean.selectedCountry.country}" />
+                </p:panelGrid>
+                <f:facet name="footer">
+                    <p:commandButton value="#{msgs['ui.logic.employee.user.detail.button.change.password']}" onclick="PF('changePasswordEmployee').show();"
+                                     title="Change password" icon="ui-icon-arrowrefresh-1-w"
+                                     rendered="#{userBean.selectedUser.roles ne userBean.roleAdmin}"/>
+                </f:facet>
+            </p:panelGrid>
+            
+            <br/>
+            
+            <p:dataTable id="employeesDatatable" value="#{employeeBean.empsList}" widgetVar="employeesDataTable"
+                         var="employee" paginator="true" rows="3"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         lazy="false" rowsPerPageTemplate="3,4,5">
+                <f:facet name="header">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.datatable.header']} #{employeeBean.deptName}" />
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{msgs['ui.logic.employee.user.detail.datatable.name']}"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{employee.name}"></h:outputText>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{msgs['ui.logic.employee.user.detail.datatable.job.role']}"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{employee.jobRole}"></h:outputText>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{msgs['ui.logic.employee.user.detail.datatable.insert.time']}"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{employee.insertTime}"></h:outputText>
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton value="#{msgs['ui.logic.employee.user.detail.datatable.button.clear']}" actionListener="#{employeeBean.reset}" update=":userDetailForm:employeesDatatable" icon="ui-icon-circle-close" />
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+        
+        <p:dialog id="changePasswordDialog" widgetVar="changePasswordEmployee" >
+            <f:facet name="header">
+                <h:outputText value="#{msgs['ui.logic.employee.user.detail.change.password.header']}" />
+            </f:facet>
+            <h:form id="changePasswordForm">
+                <p:growl id="changePasswordMessage" showDetail="true" />
+                <p:panelGrid id="displayChangePassword" columns="2" style="margin:0 auto;">
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.change.password.old.password']}" />
+                    <h:inputSecret value="#{userBean.password}" required="true" requiredMessage="Please Enter Password!" />
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.change.password.new.password']}" />
+                    <h:inputSecret value="#{userBean.newPassword}" required="true" requiredMessage="Please Enter New Password!"/>
+
+                    <h:outputText value="#{msgs['ui.logic.employee.user.detail.change.password.repeat.new.password']}" />
+                    <h:inputSecret value="#{userBean.repeatedPassword}" required="true" requiredMessage="Please Repeat New Password!"/>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="#{msgs['ui.logic.employee.user.detail.change.password.button.save']}" update="changePasswordMessage" process="changePasswordForm"
+                                         action="#{userBean.changePasswordFromDialog}" icon="ui-icon-disk">
+                            <!-- <p:ajax event="click" oncomplete="tryIfDialogCloseable();"/>
+                            <p:remoteCommand id="remoteCommandDialogCloseableId" name="tryIfDialogCloseable"
+                                             action="{employeeBean.doSuccsess}" onsuccess="PF('changePasswordEmployee').hide()" /> -->
+                        </p:commandButton>
+                        <p:commandButton value="#{msgs['ui.logic.employee.user.detail.change.password.button.cancel']}" onclick="PF('changePasswordEmployee').hide()" icon="ui-icon-circle-close"/> 
+                    </f:facet>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+    
+</ui:composition>
