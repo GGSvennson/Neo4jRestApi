@@ -36,7 +36,7 @@ In this example program the "user" and "superSecretPassword" are those that you 
 
 Client client = ClientBuilder.newClient();
 
-HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic("user", "password");
+HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(username, password);
 
 client.register(authFeature);
 
